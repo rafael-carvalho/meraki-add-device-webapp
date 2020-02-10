@@ -210,7 +210,27 @@ class BulkForm(FlaskForm):
     setips = BooleanField('IPS:&nbsp')
     ipsmode = SelectField('Mode:&nbsp;', choices=[('disabled', 'Disabled'), ('detection', 'Detection'), ('prevention', 'Prevention')])
     ipsrules = SelectField('Rule Set:&nbsp;', choices=[('connectivity', 'Connectivity'), ('balanced', 'Balanced'), ('security', 'Security')])
-    
+
+    #URL Filtering
+    set_content_filtering_url = BooleanField('Content Filtering URL Rule:&nbsp')
+    content_filtering_url_section = SelectField('Section:&nbsp;',
+                          choices=[('blockedUrlPatterns', 'Blocked URL patterns'), ('allowedUrlPatterns', 'Whitelisted URL patterns')])
+
+    content_filtering_url_action = SelectField('Action:&nbsp;',
+                                                choices=[('add', 'Add'),
+                                                         ('delete', 'Remove')])
+
+    content_filtering_url_list = TextAreaField('Rule Set :&nbsp;', )
+
+    # Content Filtering
+    set_content_filtering_categirues = BooleanField('Content Filtering Categories:&nbsp')
+
+    content_filtering_url_action = SelectField('Action:&nbsp;',
+                                               choices=[('add', 'Add'),
+                                                        ('delete', 'Remove')])
+
+    content_filtering_url_list = TextAreaField('Rule Set :&nbsp;')
+
     #VPN
     setvpn = BooleanField('VPN Hub Config:&nbsp')
     hub1 = SelectField('1:&nbsp;', choices=hubchoices)
@@ -737,7 +757,20 @@ def bulkupdate():
                 if result == None:
                     message.append('IPS settings successfully updated for Network: <strong>{}</strong>'.format(netname['name']))
                 else:
-                    message.append(result) 
+                    message.append(result)
+
+        # SET URL Filtering
+        if form.set_content_filtering_url.data:
+            for mx_network in mxnetworkstochange:
+                mx_network_name = merakiapi.getnetworkdetail(apikey, mx_network)
+                print("CHANGING URL FILTERING SETTINGS FOR NETWORK: {}".format(mx_network_name['name']))
+                result = merakiapi.edit_content_filtering_url(apikey, mx_network_name['id'], form.content_filtering_url_action.data, form.content_filtering_url_section.data, form.content_filtering_url_list.data.splitlines())
+
+                if not result:
+                    message.append('URL filtering rules successfully updated for Network: <strong>{}</strong>'.format(
+                        netname['name']))
+                else:
+                    message.append(result)
         
         ###FINISH VPN            
         if form.setvpn.data == True:

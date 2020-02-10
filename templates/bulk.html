@@ -55,7 +55,7 @@
   .hubselect {
   		float: left;
         clear: none;
-        width: 125px;
+        width: 150px;
   }
   .hubdef {
   		float: left;
@@ -69,6 +69,13 @@
   		padding: 0px;
   		height: auto;
   }
+
+  #content_filtering_url_list {
+  		width: 287px;
+  		margin: 0px;
+  		height: 128px;
+  }
+
   </style>
 </head>
 
@@ -134,8 +141,48 @@
         	    {% endfor %}
         	</div>
         </div>
-        <div class="clear"></div><br /><br />
-        
+		<div class="clear"></div>
+		<hr>
+        <div class="checkboxfield">
+            {{ form.set_content_filtering_url() }}
+            {{ form.set_content_filtering_url.label }}
+        </div>
+        <div class="clear"></div>
+        <div id="content_filtering_url" class="indent">
+        	<div class="ipslabel">
+        	    {{ form.content_filtering_url_section.label }}
+        	</div>
+        	<div class="ipsselect">
+        	    {{ form.content_filtering_url_section() }}
+        	    {% for error in form.content_filtering_url_section.errors %}
+        	    <span style="color: red;">[{{ error }}]</span>
+        	    {% endfor %}
+        	</div>
+        	<div class="clear"></div>
+			<div class="ipslabel">
+        	    {{ form.content_filtering_url_action.label }}
+        	</div>
+        	<div class="ipsselect">
+        	    {{ form.content_filtering_url_action() }}
+        	    {% for error in form.content_filtering_url_action.errors %}
+        	    <span style="color: red;">[{{ error }}]</span>
+        	    {% endfor %}
+        	</div>
+        	<div class="clear"></div>
+
+        	<div>
+        	    {{ form.content_filtering_url_list.label }}
+        	</div>
+        	<div id="" class="clear">
+        	    {{ form.content_filtering_url_list() }}
+        	    {% for error in form.tagField.errors %}
+        	    <span style="color: red;">[{{ error }}]</span>
+        	    {% endfor %}
+				<p>(Enter one pattern per line)</p>
+        	</div>
+        </div>
+        <div class="clear"></div>
+		<hr>
         <div class="checkboxfield">
             {{ form.setvpn() }}
             {{ form.setvpn.label }}
@@ -187,7 +234,8 @@
         	</div>
         	<div class="clear"></div>
         </div>
-        <div class="clear"></div><br /><br />
+        <div class="clear"></div>
+		<hr>
         
 		<div class="checkboxfield">
             {{ form.setpsk() }}

@@ -1940,6 +1940,34 @@ def updateintrusion(apikey, networkid, mode=None, idsRulesets=None, suppressprin
     return result
 
 
+# Update intrusion settings for a network
+# https://api.meraki.com/api_docs#update-a-network
+def update_content_filtering_url(apikey, networkid, mode=None, idsRulesets=None, suppressprint=False):
+
+    calltype = 'Intrusion'
+    puturl = '{0}/networks/{1}/security/intrusionSettings'.format(str(base_url), str(networkid))
+    headers = {
+        'x-cisco-meraki-api-key': format(str(apikey)),
+        'Content-Type': 'application/json'
+    }
+
+    putdata = {}
+
+    if mode:
+        putdata['mode'] = mode
+
+    if idsRulesets:
+        putdata['idsRulesets'] = idsRulesets
+
+    dashboard = requests.put(puturl, data=json.dumps(putdata), headers=headers)
+    #
+    # Call return handler function to parse Dashboard response
+    #
+    result = __returnhandler(dashboard.status_code, dashboard.text, calltype, suppressprint)
+    return result
+
+
+
 # Create a network
 # https://api.meraki.com/api_docs#create-a-network
 def addnetwork(apikey, orgid, name, nettype, tags, tz, cloneid=None, suppressprint=False):
@@ -3784,3 +3812,31 @@ def getmxperf(apikey, networkid, serial, suppressprint=False):
     dashboard = requests.get(geturl, headers=headers)
     result = __returnhandler(dashboard.status_code, dashboard.text, calltype, suppressprint)
     return result
+
+
+def edit_content_filtering_url(apikey, network_id, action, url_section, url_list, suppressprint=False):
+    content_filtering_url_url = f'{base_url}/networks/{network_id}/contentFiltering'
+    calltype = 'MX Content Filtering'
+    headers = {
+        'x-cisco-meraki-api-key': format(str(apikey)),
+        'Content-Type': 'application/json'
+    }
+    dashboard = requests.get(content_filtering_url_url, headers=headers)
+
+    existing_rules = __returnhandler(dashboard.status_code, dashboard.text, calltype, suppressprint)
+
+    payload = existing_rules.copy()
+
+    if action == 'add':
+        payload[url_section] = payload[url_section] + url_list
+    else:
+        for url in url_list:
+            while url in payload[url_section]: payload[url_section].remove(url)
+
+    calltype = 'MX Content Filtering - Update'
+    headers = {
+        'x-cisco-meraki-api-key': format(str(apikey)),
+        'Content-Type': 'application/json'
+    }
+    dashboard = requests.put(content_filtering_url_url, data=json.dumps(payload), headers=headers)
+    return __returnhandler(dashboard.status_code, dashboard.text, calltype, suppressprint)
